@@ -513,12 +513,16 @@ function goBack(){
 // ── JOIN CODE ──
 let currentJoinCode = null;
 
-function generateJoinCode(){
+async function generateJoinCode(){
   const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   let code='';
   for(let i=0;i<6;i++) code+=chars[Math.floor(Math.random()*chars.length)];
   currentJoinCode=code;
   document.getElementById('joinCodeDisplay').textContent=code;
+  try{
+    const docRef=doc(db,'church','joincode');
+    await setDoc(docRef,{code:code});
+  }catch(e){console.error('Failed to save join code:',e);}
 }
 
 function openJoinPermission(){
@@ -528,23 +532,33 @@ function openJoinPermission(){
   setTimeout(()=>document.getElementById('joinCodeInput').focus(),50);
 }
 
-function confirmJoinCode(){
+async function confirmJoinCode(){
   const val=document.getElementById('joinCodeInput').value.trim().toUpperCase();
-  if(!currentJoinCode){
-    document.getElementById('joinCodeError').textContent='✦ No code has been generated yet ✦';
-    return;
+  if(!val){return;}
+  try{
+    const docRef=doc(db,'church','joincode');
+    const snap=await getDoc(docRef);
+    if(!snap.exists()||!snap.data().code){
+      document.getElementById('joinCodeError').textContent='✦ No code has been generated yet ✦';
+      return;
+    }
+    const savedCode=snap.data().code;
+    if(val!==savedCode){
+      document.getElementById('joinCodeError').textContent='✦ Wrong code — access denied ✦';
+      document.getElementById('joinCodeInput').value='';
+      return;
+    }
+    // Correct — delete from Firebase (single use) then open Discord
+    await setDoc(docRef,{code:null});
+    currentJoinCode=null;
+    document.getElementById('joinCodeDisplay').textContent='—';
+    document.getElementById('joinPermModal').classList.remove('visible');
+    document.getElementById('joinModal').classList.remove('visible');
+    window.open('https://discord.gg/VavHfMwH3b','_blank');
+  }catch(e){
+    console.error('Join code check failed:',e);
+    document.getElementById('joinCodeError').textContent='✦ Error checking code, try again ✦';
   }
-  if(val!==currentJoinCode){
-    document.getElementById('joinCodeError').textContent='✦ Wrong code — access denied ✦';
-    document.getElementById('joinCodeInput').value='';
-    return;
-  }
-  // Code correct — open Discord and reset code
-  currentJoinCode=null;
-  document.getElementById('joinCodeDisplay').textContent='—';
-  document.getElementById('joinPermModal').classList.remove('visible');
-  document.getElementById('joinModal').classList.remove('visible');
-  window.open('https://discord.gg/VavHfMwH3b','_blank');
 }
 
 // Show dev section in join modal when dev mode is active
