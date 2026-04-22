@@ -563,14 +563,14 @@ async function confirmJoinCode(){
       document.getElementById('joinCodeInput').value='';
       return;
     }
-    // Correct — wipe code from Firebase (single use) then open Discord
+    // Correct — wipe code from Firebase (single use) then show Discord widget
     await setDoc(docRef,{code:''});
     currentJoinCode=null;
     if(document.getElementById('joinCodeDisplay'))
       document.getElementById('joinCodeDisplay').textContent='—';
     document.getElementById('joinPermModal').classList.remove('visible');
     document.getElementById('joinModal').classList.remove('visible');
-    window.open('https://discord.gg/VavHfMwH3b','_blank');
+    document.getElementById('discordWidgetModal').classList.add('visible');
   }catch(e){
     console.error('Join code check failed:',e);
     errEl.textContent='✦ Firebase error — check Firestore rules ✦';
@@ -606,5 +606,36 @@ window.confirmJoinCode=confirmJoinCode;
 window.syncJoinDevSection=syncJoinDevSection;
 window.renderMembers=renderMembers;
 </script>
+<!-- ═══════════════════════════════════════════════════════
+     DISCORD WIDGET MODAL
+     To change the widget: find the <iframe> below and replace
+     the server ID in the src URL (the number after widget?id=)
+     Current server ID: 899236243739668500
+     You can also change width/height of the iframe here.
+═══════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="discordWidgetModal">
+  <div class="modal-box" style="max-width:420px;padding:2rem 1.5rem;">
+    <div class="modal-title" style="margin-bottom:.5rem;">✦ You Are Worthy ✦</div>
+    <div style="font-family:'IM Fell English',serif;font-style:italic;font-size:.85rem;color:var(--parchment);opacity:.6;margin-bottom:1.25rem;">Welcome to the Holy Order of Downtown</div>
+
+    <!-- ▼▼▼ EDIT YOUR DISCORD WIDGET HERE ▼▼▼ -->
+    <iframe
+      src="https://discord.com/widget?id=899236243739668500&theme=dark"
+      width="350"
+      height="400"
+      allowtransparency="true"
+      frameborder="0"
+      sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"
+      style="border-radius:4px;max-width:100%;">
+    </iframe>
+    <!-- ▲▲▲ EDIT YOUR DISCORD WIDGET HERE ▲▲▲ -->
+
+    <div class="modal-btns" style="margin-top:1.25rem;">
+      <button class="modal-btn cancel" onclick="document.getElementById('discordWidgetModal').classList.remove('visible')">Close</button>
+      <button class="modal-btn" onclick="window.open('https://discord.gg/VavHfMwH3b','_blank')">Join Server</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
