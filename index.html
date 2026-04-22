@@ -518,11 +518,18 @@ async function generateJoinCode(){
   let code='';
   for(let i=0;i<6;i++) code+=chars[Math.floor(Math.random()*chars.length)];
   currentJoinCode=code;
-  document.getElementById('joinCodeDisplay').textContent=code;
+  const display=document.getElementById('joinCodeDisplay');
+  display.textContent='Saving…';
   try{
     const docRef=doc(db,'church','joincode');
     await setDoc(docRef,{code:code});
-  }catch(e){console.error('Failed to save join code:',e);}
+    display.textContent=code;
+    showToast('Code saved to server ✦');
+  }catch(e){
+    console.error('Failed to save join code:',e);
+    display.textContent='ERROR — '+e.code;
+    showToast('Failed to save code!');
+  }
 }
 
 function openJoinPermission(){
@@ -533,31 +540,40 @@ function openJoinPermission(){
 }
 
 async function confirmJoinCode(){
-  const val=document.getElementById('joinCodeInput').value.trim().toUpperCase();
+  const raw=document.getElementById('joinCodeInput').value.trim();
+  const val=raw.toUpperCase();
   if(!val){return;}
+  const errEl=document.getElementById('joinCodeError');
+  errEl.textContent='Checking…';
   try{
     const docRef=doc(db,'church','joincode');
     const snap=await getDoc(docRef);
-    if(!snap.exists()||!snap.data().code){
-      document.getElementById('joinCodeError').textContent='✦ No code has been generated yet ✦';
+    if(!snap.exists()){
+      errEl.textContent='✦ No code has been generated yet ✦';
       return;
     }
-    const savedCode=snap.data().code;
+    const data=snap.data();
+    const savedCode=(data.code||'').toUpperCase().trim();
+    if(!savedCode){
+      errEl.textContent='✦ No code has been generated yet ✦';
+      return;
+    }
     if(val!==savedCode){
-      document.getElementById('joinCodeError').textContent='✦ Wrong code — access denied ✦';
+      errEl.textContent='✦ Wrong code — access denied ✦';
       document.getElementById('joinCodeInput').value='';
       return;
     }
-    // Correct — delete from Firebase (single use) then open Discord
-    await setDoc(docRef,{code:null});
+    // Correct — wipe code from Firebase (single use) then open Discord
+    await setDoc(docRef,{code:''});
     currentJoinCode=null;
-    document.getElementById('joinCodeDisplay').textContent='—';
+    if(document.getElementById('joinCodeDisplay'))
+      document.getElementById('joinCodeDisplay').textContent='—';
     document.getElementById('joinPermModal').classList.remove('visible');
     document.getElementById('joinModal').classList.remove('visible');
     window.open('https://discord.gg/VavHfMwH3b','_blank');
   }catch(e){
     console.error('Join code check failed:',e);
-    document.getElementById('joinCodeError').textContent='✦ Error checking code, try again ✦';
+    errEl.textContent='✦ Firebase error — check Firestore rules ✦';
   }
 }
 
