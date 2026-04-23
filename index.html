@@ -63,7 +63,7 @@ body{background:var(--dark);color:var(--parchment);font-family:'Cinzel',serif;ov
 
 /* Probe background */
 .probe-scene{display:none;position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
-.probe-scene img{position:absolute;top:50%;left:50%;transform:translate(-50%,-42%);width:85%;height:85%;object-fit:cover;opacity:0.22;filter:brightness(0.55) saturate(1.2)}
+.probe-scene img{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:85%;height:85%;object-fit:cover;opacity:0.22;filter:brightness(0.55) saturate(1.2)}
 .probe-scene::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(10,8,7,0.2) 0%,rgba(10,8,7,0.75) 100%)}
 #members-view.probe-bg .probe-scene{display:block}
 #members-view>div.inner{position:relative;z-index:1}
@@ -607,20 +607,36 @@ window.syncJoinDevSection=syncJoinDevSection;
 window.renderMembers=renderMembers;
 </script>
 <!-- ═══════════════════════════════════════════════════════
-     DISCORD WIDGET MODAL
-     To change the widget: find the <iframe> below and replace
-     the server ID in the src URL (the number after widget?id=)
-     Current server ID: 
-     You can also change width/height of the iframe here.
+     YOU ARE WORTHY MODAL
+     To change the Discord link: find the line below that says
+     href="https://discord.gg/..."  and replace the link.
 ═══════════════════════════════════════════════════════ -->
 <div class="modal-overlay" id="discordWidgetModal">
-  <div class="modal-box" style="max-width:420px;padding:2rem 1.5rem;">
-    <div class="modal-title" style="margin-bottom:.5rem;">✦ You Are Worthy ✦</div>
-    <div style="font-family:'IM Fell English',serif;font-style:italic;font-size:.85rem;color:var(--parchment);opacity:.6;margin-bottom:1.25rem;">Welcome to the Holy Order of Downtown</div>
+  <div class="modal-box" style="max-width:400px;padding:2.5rem 2rem;text-align:center;">
 
-    <!-- ▼▼▼ EDIT YOUR DISCORD WIDGET HERE ▼▼▼ -->
-    
-    <!-- ▲▲▲ EDIT YOUR DISCORD WIDGET HERE ▲▲▲ -->
+    <!-- Title -->
+    <div class="modal-title" style="font-size:1.5rem;margin-bottom:.4rem;">✦ You Are Worthy ✦</div>
+    <div style="font-family:'IM Fell English',serif;font-style:italic;font-size:.9rem;color:var(--parchment);opacity:.6;margin-bottom:1.5rem;">Welcome to the Holy Order of Downtown</div>
+
+    <!-- Divider -->
+    <div style="width:200px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:0 auto 1.5rem;"></div>
+
+    <!-- ▼▼▼ CHANGE YOUR DISCORD LINK HERE ▼▼▼ -->
+    <a href="https://discord.gg/VavHfMwH3b" target="_blank" rel="noopener noreferrer"
+       style="display:inline-flex;flex-direction:column;align-items:center;gap:.75rem;text-decoration:none;transition:transform .2s;"
+       onmouseover="this.style.transform='translateY(-3px)'"
+       onmouseout="this.style.transform='translateY(0)'">
+      <!-- Discord Logo SVG -->
+      <svg width="64" height="64" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"
+           style="filter:drop-shadow(0 0 12px rgba(88,101,242,0.7))">
+        <circle cx="12" cy="12" r="12" fill="#5865F2"/>
+        <path fill="white" d="M19.317 5.37a18.8 18.8 0 0 0-4.635-1.44.07.07 0 0 0-.074.035 13.2 13.2 0 0 0-.578 1.188 17.37 17.37 0 0 0-5.212 0 12.1 12.1 0 0 0-.586-1.188.072.072 0 0 0-.074-.035 18.74 18.74 0 0 0-4.637 1.44.065.065 0 0 0-.03.026C1.505 9.6.806 13.7 1.094 17.747a.077.077 0 0 0 .03.053 18.9 18.9 0 0 0 5.694 2.88.073.073 0 0 0 .079-.026c.438-.599.83-1.232 1.165-1.896a.071.071 0 0 0-.039-.099 12.44 12.44 0 0 1-1.779-.848.072.072 0 0 1-.007-.12c.12-.09.24-.183.354-.278a.07.07 0 0 1 .073-.01c3.731 1.704 7.773 1.704 11.46 0a.07.07 0 0 1 .074.009c.114.095.233.19.354.279a.072.072 0 0 1-.006.12c-.568.332-1.16.614-1.78.847a.071.071 0 0 0-.038.1c.342.663.733 1.295 1.164 1.895a.072.072 0 0 0 .08.027 18.86 18.86 0 0 0 5.7-2.88.073.073 0 0 0 .03-.052c.334-4.553-.559-8.613-2.366-12.352a.057.057 0 0 0-.028-.027zM8.02 15.33c-1.123 0-2.05-1.032-2.05-2.3 0-1.267.908-2.299 2.05-2.299 1.15 0 2.068 1.04 2.05 2.3 0 1.267-.908 2.299-2.05 2.299zm7.974 0c-1.123 0-2.05-1.032-2.05-2.3 0-1.267.908-2.299 2.05-2.299 1.15 0 2.068 1.04 2.05 2.3 0 1.267-.9 2.299-2.05 2.299z"/>
+      </svg>
+      <span style="font-family:'Cinzel',serif;font-size:.8rem;font-weight:700;letter-spacing:.15em;color:#7289da;text-transform:uppercase;">Click to Join Discord</span>
+    </a>
+    <!-- ▲▲▲ CHANGE YOUR DISCORD LINK HERE ▲▲▲ -->
+
+    <div style="width:200px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:1.5rem auto 0;"></div>
 
     <div class="modal-btns" style="margin-top:1.25rem;">
       <button class="modal-btn cancel" onclick="document.getElementById('discordWidgetModal').classList.remove('visible')">Close</button>
