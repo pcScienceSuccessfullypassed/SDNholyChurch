@@ -72,6 +72,7 @@ body{background:var(--dark);color:var(--parchment);font-family:'Cinzel',serif;ov
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 .pyramid-connector{width:2px;height:14px;background:linear-gradient(to bottom,rgba(201,151,43,.5),rgba(201,151,43,.15));margin:0 auto}
 
+
 /* DISCORD FAB */
 .discord-fab{position:fixed;bottom:2rem;right:2rem;z-index:300;display:flex;align-items:center;gap:.55rem;background:var(--discord);border:none;color:#fff;font-family:'Cinzel',serif;font-size:.72rem;font-weight:700;letter-spacing:.1em;padding:.7rem 1.3rem .7rem 1rem;cursor:pointer;clip-path:polygon(10px 0%,100% 0%,calc(100% - 10px) 100%,0% 100%);transition:background .2s,box-shadow .2s,transform .15s;box-shadow:0 4px 20px rgba(88,101,242,.45);text-decoration:none;animation:floatD 4s ease-in-out infinite}
 @keyframes floatD{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
@@ -161,6 +162,9 @@ body{background:var(--dark);color:var(--parchment);font-family:'Cinzel',serif;ov
 .corner-ornament.tr{top:12px;right:12px;border-top:2px solid var(--gold);border-right:2px solid var(--gold)}
 .corner-ornament.bl{bottom:12px;left:12px;border-bottom:2px solid var(--gold);border-left:2px solid var(--gold)}
 .corner-ornament.br{bottom:12px;right:12px;border-bottom:2px solid var(--gold);border-right:2px solid var(--gold)}
+.flames{position:absolute;bottom:0;left:0;right:0;height:220px;z-index:1;pointer-events:none;overflow:hidden}
+.flame{position:absolute;bottom:0;width:3px;border-radius:50% 50% 20% 20%;animation:flicker linear infinite;opacity:0}
+@keyframes flicker{0%{opacity:0;transform:translateY(0) scaleX(1)}10%{opacity:.9}50%{transform:translateY(-120px) scaleX(.6) rotate(3deg);opacity:.6}100%{transform:translateY(-220px) scaleX(.2) rotate(-5deg);opacity:0}}
 body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:.35}
 </style>
 </head>
@@ -253,7 +257,7 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
     </div>
   </div>
   <div id="page-roles">
-    <div style="max-width:860px;margin:0 auto;position:relative;z-index:1;">
+    <div style="max-width:860px;margin:0 auto;position:relative;z-index:2;">
       <div class="roles-header">
         <div class="roles-eyebrow">ศาสนจักร · Downtown 1866</div>
         <div class="roles-title">The Sacred Ranks</div>
@@ -366,113 +370,13 @@ function showToast(msg,isError){
   setTimeout(()=>{t.classList.remove('show');t.style.borderColor='';t.style.color='';},isError?3500:2400);
 }
 
-// Flames
-// ── CANVAS LIVE WALLPAPER ──
-(function initCanvas(){
-  const canvas=document.createElement('canvas');
-  canvas.id='bgCanvas';
-  canvas.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;';
-  document.body.insertBefore(canvas,document.body.firstChild);
 
-  const ctx=canvas.getContext('2d');
-  let W,H,particles=[];
 
-  function resize(){
-    W=canvas.width=window.innerWidth;
-    H=canvas.height=window.innerHeight;
-  }
-  resize();
-  window.addEventListener('resize',resize);
 
-  const COLORS=['#d4500a','#c9972b','#f5d078','#8b1a1a','#e8750a'];
-
-  function Particle(){
-    this.reset=function(){
-      this.x=Math.random()*W;
-      this.y=H+Math.random()*60;
-      this.size=Math.random()*3+1;
-      this.speedY=Math.random()*1.2+0.4;
-      this.speedX=(Math.random()-0.5)*0.4;
-      this.alpha=0;
-      this.fadeIn=Math.random()*0.04+0.01;
-      this.fadeOut=Math.random()*0.008+0.003;
-      this.life=0;
-      this.maxLife=Math.random()*180+100;
-      this.color=COLORS[Math.floor(Math.random()*COLORS.length)];
-      this.wobble=Math.random()*Math.PI*2;
-      this.wobbleSpeed=Math.random()*0.05+0.02;
-    };
-    this.reset();
-    this.y=Math.random()*H; // spread initial positions
-    this.life=Math.random()*this.maxLife;
-  }
-
-  for(let i=0;i<120;i++) particles.push(new Particle());
-
-  // Glow orbs
-  const orbs=[
-    {x:0.2,y:0.7,r:0.25,color:'rgba(212,80,10,',speed:0.0003,phase:0},
-    {x:0.8,y:0.4,r:0.2,color:'rgba(201,151,43,',speed:0.0004,phase:1.5},
-    {x:0.5,y:0.9,r:0.18,color:'rgba(139,26,26,',speed:0.0005,phase:3},
-  ];
-
-  function draw(){
-    ctx.clearRect(0,0,W,H);
-
-    // Draw glow orbs in background
-    orbs.forEach(o=>{
-      o.phase+=o.speed;
-      const px=(o.x+Math.sin(o.phase)*0.08)*W;
-      const py=(o.y+Math.cos(o.phase)*0.06)*H;
-      const r=o.r*Math.min(W,H);
-      const grad=ctx.createRadialGradient(px,py,0,px,py,r);
-      grad.addColorStop(0,o.color+'0.12)');
-      grad.addColorStop(1,o.color+'0)');
-      ctx.fillStyle=grad;
-      ctx.beginPath();
-      ctx.arc(px,py,r,0,Math.PI*2);
-      ctx.fill();
-    });
-
-    // Draw particles (embers rising)
-    particles.forEach(p=>{
-      p.life++;
-      p.wobble+=p.wobbleSpeed;
-      p.x+=p.speedX+Math.sin(p.wobble)*0.3;
-      p.y-=p.speedY;
-
-      if(p.life<30) p.alpha=Math.min(p.alpha+p.fadeIn,0.85);
-      else if(p.life>p.maxLife-40) p.alpha=Math.max(p.alpha-p.fadeOut,0);
-
-      if(p.life>=p.maxLife||p.y<-20) p.reset();
-
-      ctx.save();
-      ctx.globalAlpha=p.alpha;
-      const grad=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.size*2.5);
-      grad.addColorStop(0,p.color);
-      grad.addColorStop(1,'transparent');
-      ctx.fillStyle=grad;
-      ctx.beginPath();
-      ctx.arc(p.x,p.y,p.size*2.5,0,Math.PI*2);
-      ctx.fill();
-
-      // Bright core
-      ctx.globalAlpha=p.alpha*0.9;
-      ctx.fillStyle='#fff8e7';
-      ctx.beginPath();
-      ctx.arc(p.x,p.y,p.size*0.5,0,Math.PI*2);
-      ctx.fill();
-      ctx.restore();
-    });
-
-    requestAnimationFrame(draw);
-  }
-  draw();
-
-  // Also keep the small hero flames overlay for bottom effect
-  const c=document.getElementById('flames');
+(function spawnFlames(){
   const colors=['#d4500a','#c9972b','#f5d078','#8b1a1a'];
-  for(let i=0;i<30;i++){
+  const c=document.getElementById('flames');
+  for(let i=0;i<40;i++){
     const f=document.createElement('div');f.className='flame';
     const s=Math.random()*6+2;
     f.style.cssText=`left:${Math.random()*100}%;width:${s}px;height:${s*(4+Math.random()*6)}px;background:linear-gradient(to top,${colors[Math.floor(Math.random()*colors.length)]},transparent);animation-duration:${1.5+Math.random()*2.5}s;animation-delay:${Math.random()*3}s;`;
@@ -499,22 +403,33 @@ function renderPyramid(){
 function getLastName(entry){
   const name=typeof entry==='string'?entry:entry.name;
   const parts=name.trim().split(/\s+/);
-  // Use last word as sort key, fallback to full name
   return (parts.length>1?parts[parts.length-1]:parts[0]).toLowerCase();
+}
+
+function isKimDokja(entry){
+  const name=(typeof entry==='string'?entry:entry.name).trim().toLowerCase();
+  return name==='kim dokja';
+}
+
+function sortByLastName(arr){
+  // Auto sort storage by last name (Kim Dokja always first), preserving manual rank changes
+  return arr.sort((a,b)=>{
+    if(isKimDokja(a)) return -1;
+    if(isKimDokja(b)) return 1;
+    return getLastName(a).localeCompare(getLastName(b));
+  });
 }
 
 function renderMembers(roleName){
   const list=document.getElementById('membersList');
   const arr=members[roleName]||[];list.innerHTML='';
   if(arr.length===0){list.innerHTML='<div class="empty-members">No members recorded yet.</div>';return;}
-  // Sort a display copy by last name alphabetically, keep original array order in storage
-  const sorted=[...arr].sort((a,b)=>getLastName(a).localeCompare(getLastName(b)));
-  sorted.forEach((entry,i)=>{
-    const origIdx=arr.indexOf(entry);
+  // Render in current storage order (which reflects manual ranks + auto sort on add)
+  arr.forEach((entry,i)=>{
     const name = typeof entry==='string' ? entry : entry.name;
     const bird = typeof entry==='string' ? '' : (entry.bird||'');
     const card=document.createElement('div');card.className='member-card';card.style.animationDelay=`${i*.06}s`;
-    card.innerHTML=`<span class="member-num">${String(i+1).padStart(2,'0')}</span><span class="member-cross">✦</span><div class="member-name-wrap"><span class="member-name" id="mname-${origIdx}" onclick="toggleBird(this)">${escHtml(name)}</span><span class="member-bird" id="mbird-${origIdx}">${escHtml(bird)}</span></div><div class="member-actions"><button class="action-btn" onclick="doEdit(${origIdx})">Edit</button><button class="action-btn danger" onclick="doDelete(${origIdx})">Delete</button></div>`;
+    card.innerHTML=`<span class="member-num">${String(i+1).padStart(2,'0')}</span><span class="member-cross">✦</span><div class="member-name-wrap"><span class="member-name" id="mname-${i}" onclick="toggleBird(this)">${escHtml(name)}</span><span class="member-bird" id="mbird-${i}">${escHtml(bird)}</span></div><div class="member-actions"><button class="action-btn" onclick="doEdit(${i})">Edit</button><button class="action-btn danger" onclick="doDelete(${i})">Delete</button></div>`;
     list.appendChild(card);
   });
 }
@@ -582,6 +497,8 @@ function doAdd(){
     const lastName=e=>{const n=(typeof e==='string'?e:e.name).trim().split(' ');return n[n.length-1].toLowerCase();};
     return lastName(a).localeCompare(lastName(b));
   });
+  // Auto-sort by last name after adding (Kim Dokja always first)
+  members[currentRole]=sortByLastName(members[currentRole]);
   saveMembers();renderMembers(currentRole);renderPyramid();
   showToast('Member added ✦');
 }
