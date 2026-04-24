@@ -30,14 +30,14 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--gold:#c9972b;--gold-bright:#f5d078;--gold-dim:#7a5a1a;--dark:#0a0807;--dark2:#110e0a;--dark3:#1a1410;--parchment:#e8d5a3;--discord:#5865F2;--discord-hover:#4752C4}
 html{scroll-behavior:smooth}
-body{background:var(--dark);color:var(--parchment);font-family:'Cinzel',serif;overflow-x:hidden}
-#main-view{display:block;position:relative;z-index:1}
-#members-view{display:none;position:relative;z-index:1}
+body{background:#0a0807;color:var(--parchment);font-family:'Cinzel',serif;overflow-x:hidden}
+#main-view{display:block;position:relative;z-index:2}
+#members-view{display:none;position:relative;z-index:2}
 
 /* HERO */
 #page-hero{position:relative;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden}
-.hero-bg{position:absolute;inset:0;background:linear-gradient(160deg,rgba(26,14,6,0.88) 0%,rgba(10,8,7,0.85) 60%,rgba(17,10,6,0.88) 100%);z-index:0}
-.hero-bg::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(201,151,43,0.08) 0%,transparent 70%)}
+.hero-bg{position:absolute;inset:0;background:transparent;z-index:0}
+.hero-bg::after{content:'';position:absolute;inset:0;background:transparent}
 .flames{position:absolute;bottom:0;left:0;right:0;height:220px;z-index:1;pointer-events:none;overflow:hidden}
 .flame{position:absolute;bottom:0;width:3px;border-radius:50% 50% 20% 20%;animation:flicker linear infinite;opacity:0}
 @keyframes flicker{0%{opacity:0;transform:translateY(0) scaleX(1)}10%{opacity:.9}50%{transform:translateY(-120px) scaleX(.6) rotate(3deg);opacity:.6}100%{transform:translateY(-220px) scaleX(.2) rotate(-5deg);opacity:0}}
@@ -55,8 +55,8 @@ body{background:var(--dark);color:var(--parchment);font-family:'Cinzel',serif;ov
 @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
 
 /* ROLES */
-#page-roles{min-height:100vh;background:rgba(17,14,10,0.82);background-image:radial-gradient(ellipse at center top,rgba(201,151,43,.07) 0%,transparent 60%);padding:4rem 2rem 8rem;position:relative;overflow:hidden}
-#page-roles::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+#page-roles{min-height:100vh;background:transparent;padding:4rem 2rem 8rem;position:relative;overflow:hidden}
+#page-roles::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,var(--gold),transparent);z-index:3}
 .roles-header{text-align:center;margin-bottom:3rem}
 .roles-eyebrow{font-size:.65rem;letter-spacing:.35em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:.75rem}
 .roles-title{font-family:'Cinzel Decorative',serif;font-size:clamp(1.6rem,4vw,2.8rem);color:var(--gold-bright);text-shadow:0 0 30px rgba(201,151,43,.4)}
@@ -79,7 +79,7 @@ body{background:var(--dark);color:var(--parchment);font-family:'Cinzel',serif;ov
 .discord-fab svg{width:1.05rem;height:1.05rem;fill:#fff;flex-shrink:0}
 
 /* MEMBERS PAGE */
-#members-view{min-height:100vh;background:rgba(26,20,16,0.85);padding:4rem 2rem 6rem;position:relative;overflow:hidden}
+#members-view{min-height:100vh;background:transparent;padding:4rem 2rem 6rem;position:relative;overflow:hidden}
 #members-view::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
 
 /* Probe background */
@@ -390,14 +390,14 @@ function showToast(msg,isError){
     this.reset=function(){
       this.x=Math.random()*W;
       this.y=H+Math.random()*60;
-      this.size=Math.random()*3+1;
-      this.speedY=Math.random()*1.2+0.4;
-      this.speedX=(Math.random()-0.5)*0.4;
+      this.size=Math.random()*1.5+0.4;
+      this.speedY=Math.random()*0.6+0.2;
+      this.speedX=(Math.random()-0.5)*0.15;
       this.alpha=0;
-      this.fadeIn=Math.random()*0.04+0.01;
-      this.fadeOut=Math.random()*0.008+0.003;
+      this.fadeIn=Math.random()*0.02+0.005;
+      this.fadeOut=Math.random()*0.005+0.002;
       this.life=0;
-      this.maxLife=Math.random()*180+100;
+      this.maxLife=Math.random()*300+200;
       this.color=COLORS[Math.floor(Math.random()*COLORS.length)];
       this.wobble=Math.random()*Math.PI*2;
       this.wobbleSpeed=Math.random()*0.05+0.02;
@@ -407,7 +407,7 @@ function showToast(msg,isError){
     this.life=Math.random()*this.maxLife;
   }
 
-  for(let i=0;i<120;i++) particles.push(new Particle());
+  for(let i=0;i<180;i++) particles.push(new Particle());
 
   // Glow orbs
   const orbs=[
@@ -444,24 +444,32 @@ function showToast(msg,isError){
       if(p.life<30) p.alpha=Math.min(p.alpha+p.fadeIn,0.85);
       else if(p.life>p.maxLife-40) p.alpha=Math.max(p.alpha-p.fadeOut,0);
 
-      if(p.life>=p.maxLife||p.y<-20) p.reset();
+      if(p.life>=p.maxLife||p.y<-50) p.reset();
 
       ctx.save();
       ctx.globalAlpha=p.alpha;
-      const grad=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.size*2.5);
-      grad.addColorStop(0,p.color);
+      // Draw as a tall vertical streak/line
+      const lineH=p.size*28+20;
+      const grad=ctx.createLinearGradient(p.x,p.y,p.x,p.y+lineH);
+      grad.addColorStop(0,'transparent');
+      grad.addColorStop(0.3,p.color);
+      grad.addColorStop(0.7,p.color);
       grad.addColorStop(1,'transparent');
-      ctx.fillStyle=grad;
+      ctx.strokeStyle=grad;
+      ctx.lineWidth=p.size*0.7;
+      ctx.lineCap='round';
       ctx.beginPath();
-      ctx.arc(p.x,p.y,p.size*2.5,0,Math.PI*2);
-      ctx.fill();
-
-      // Bright core
-      ctx.globalAlpha=p.alpha*0.9;
-      ctx.fillStyle='#fff8e7';
+      ctx.moveTo(p.x,p.y+lineH);
+      ctx.lineTo(p.x,p.y);
+      ctx.stroke();
+      // Bright glowing core line
+      ctx.globalAlpha=p.alpha*0.6;
+      ctx.strokeStyle='rgba(255,248,220,0.9)';
+      ctx.lineWidth=p.size*0.2;
       ctx.beginPath();
-      ctx.arc(p.x,p.y,p.size*0.5,0,Math.PI*2);
-      ctx.fill();
+      ctx.moveTo(p.x,p.y+lineH*0.4);
+      ctx.lineTo(p.x,p.y);
+      ctx.stroke();
       ctx.restore();
     });
 
