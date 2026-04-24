@@ -336,7 +336,14 @@ async function saveMembers(){
     await setDoc(docRef,members);
   }catch(e){console.error('Firebase save error:',e);}
 }
-function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2400);}
+function showToast(msg,isError){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.style.borderColor=isError?'#c04040':'var(--gold)';
+  t.style.color=isError?'#e06060':'var(--gold-bright)';
+  t.classList.add('show');
+  setTimeout(()=>{t.classList.remove('show');t.style.borderColor='';t.style.color='';},isError?3500:2400);
+}
 
 // Flames
 (function spawnFlames(){
@@ -422,8 +429,13 @@ function doAdd(){
   const posVal=document.getElementById('posInput').value.trim();
   if(!name)return;
   const arr=members[currentRole];
+  // Check for duplicate name (case-insensitive)
+  const duplicate=arr.find(e=>(typeof e==='string'?e:e.name).toLowerCase()===name.toLowerCase());
+  if(duplicate){
+    showToast(`"${name}" already exists in ${currentRole} — can't be added!`,true);
+    return;
+  }
   const entry={name,bird};
-  // Position is 1-based; if blank or out of range, append at end
   let pos=parseInt(posVal);
   if(!posVal||isNaN(pos)||pos<1||pos>arr.length+1){
     arr.push(entry);
