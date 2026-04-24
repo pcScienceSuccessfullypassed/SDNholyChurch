@@ -260,8 +260,9 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
     <div class="add-member-wrap">
       <span class="add-member-label">✦ Add a Member ✦</span>
       <div class="add-member-row">
-        <input class="add-member-input" id="memberInput" type="text" placeholder="Name…" onkeydown="if(event.key==='Enter') document.getElementById('birdInput').focus()">
-        <input class="add-member-input" id="birdInput" type="text" placeholder="Bird No. (e.g. #1234)" style="max-width:160px" onkeydown="if(event.key==='Enter') doAdd()">
+        <input class="add-member-input" id="memberInput" type="text" placeholder="Name…" onkeydown="if(event.key==='Enter') document.getElementById('birdInput').focus()" style="min-width:120px">
+        <input class="add-member-input" id="birdInput" type="text" placeholder="Bird No." style="max-width:110px" onkeydown="if(event.key==='Enter'){var pi=document.getElementById('posInput');pi.value=members[currentRole].length+1;pi.focus();}">
+        <input class="add-member-input" id="posInput" type="number" min="1" placeholder="Rank" style="max-width:70px" onkeydown="if(event.key==='Enter') doAdd()">
         <button class="add-member-btn" onclick="doAdd()">Add</button>
       </div>
     </div>
@@ -418,10 +419,20 @@ function doAdd(){
   if(!devMode)return;
   const name=document.getElementById('memberInput').value.trim();
   const bird=document.getElementById('birdInput').value.trim();
+  const posVal=document.getElementById('posInput').value.trim();
   if(!name)return;
-  members[currentRole].push({name,bird});
+  const arr=members[currentRole];
+  const entry={name,bird};
+  // Position is 1-based; if blank or out of range, append at end
+  let pos=parseInt(posVal);
+  if(!posVal||isNaN(pos)||pos<1||pos>arr.length+1){
+    arr.push(entry);
+  } else {
+    arr.splice(pos-1,0,entry);
+  }
   document.getElementById('memberInput').value='';
   document.getElementById('birdInput').value='';
+  document.getElementById('posInput').value='';
   saveMembers();renderMembers(currentRole);renderPyramid();
   showToast('Member added ✦');
 }
@@ -438,8 +449,9 @@ function doEdit(idx){
   const entry=members[currentRole][idx];
   const curName=typeof entry==='string'?entry:entry.name;
   const curBird=typeof entry==='string'?'':entry.bird||'';
+  const arr=members[currentRole];
   const wrap=document.getElementById(`mname-${idx}`).closest('.member-name-wrap');
-  wrap.innerHTML=`<input class="member-name-input" id="medit-name-${idx}" value="${curName.replace(/"/g,'&quot;')}" placeholder="Name"><input class="bird-input" id="medit-bird-${idx}" value="${curBird.replace(/"/g,'&quot;')}" placeholder="Bird No.">`;
+  wrap.innerHTML=`<input class="member-name-input" id="medit-name-${idx}" value="${curName.replace(/"/g,'&quot;')}" placeholder="Name" style="min-width:100px"><input class="bird-input" id="medit-bird-${idx}" value="${curBird.replace(/"/g,'&quot;')}" placeholder="Bird No."><input class="bird-input" id="medit-pos-${idx}" type="number" min="1" max="${arr.length}" value="${idx+1}" placeholder="Rank" style="width:58px">`;
   document.getElementById(`medit-name-${idx}`).focus();
   const actions=wrap.closest('.member-card').querySelector('.member-actions');
   actions.innerHTML=`<button class="action-btn" onclick="doSave(${idx})">Save</button><button class="action-btn cancel" onclick="renderMembers('${currentRole}')">Cancel</button>`;
@@ -450,11 +462,20 @@ function doSave(idx){
   if(!devMode)return;
   const nameInp=document.getElementById(`medit-name-${idx}`);
   const birdInp=document.getElementById(`medit-bird-${idx}`);
+  const posInp=document.getElementById(`medit-pos-${idx}`);
   if(!nameInp)return;
   const newName=nameInp.value.trim();if(!newName)return;
   const newBird=birdInp?birdInp.value.trim():'';
-  members[currentRole][idx]={name:newName,bird:newBird};
-  saveMembers();renderMembers(currentRole);
+  const arr=members[currentRole];
+  const entry={name:newName,bird:newBird};
+  // Remove from current position
+  arr.splice(idx,1);
+  // Insert at new position
+  let newPos=posInp?parseInt(posInp.value):idx+1;
+  if(isNaN(newPos)||newPos<1) newPos=1;
+  if(newPos>arr.length+1) newPos=arr.length+1;
+  arr.splice(newPos-1,0,entry);
+  saveMembers();renderMembers(currentRole);renderPyramid();
   showToast('Member updated ✦');
 }
 
