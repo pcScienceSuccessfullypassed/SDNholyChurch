@@ -56,6 +56,8 @@ body{background:var(--dark);color:var(--parchment);font-family:'Cinzel',serif;ov
 
 /* ROLES */
 #page-roles{min-height:100vh;background:var(--dark2);background-image:radial-gradient(ellipse at center top,rgba(201,151,43,.07) 0%,transparent 60%);padding:4rem 2rem 8rem;position:relative;overflow:hidden}
+.roles-flames{position:fixed;bottom:0;left:0;right:0;height:100vh;z-index:0;pointer-events:none;overflow:hidden}
+.roles-flames .flame{bottom:0}
 #page-roles::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
 .roles-header{text-align:center;margin-bottom:3rem}
 .roles-eyebrow{font-size:.65rem;letter-spacing:.35em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:.75rem}
@@ -253,7 +255,8 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
     </div>
   </div>
   <div id="page-roles">
-    <div style="max-width:860px;margin:0 auto;">
+    <div class="roles-flames" id="rolesFlames"></div>
+    <div style="max-width:860px;margin:0 auto;position:relative;z-index:1;">
       <div class="roles-header">
         <div class="roles-eyebrow">ศาสนจักร · Downtown 1866</div>
         <div class="roles-title">The Sacred Ranks</div>
@@ -367,15 +370,39 @@ function showToast(msg,isError){
 }
 
 // Flames
-(function spawnFlames(){
-  const c=document.getElementById('flames');
+function spawnFlameParticles(container, count, maxHeight){
   const colors=['#d4500a','#c9972b','#f5d078','#8b1a1a'];
-  for(let i=0;i<40;i++){
+  for(let i=0;i<count;i++){
     const f=document.createElement('div');f.className='flame';
     const s=Math.random()*6+2;
-    f.style.cssText=`left:${Math.random()*100}%;width:${s}px;height:${s*(4+Math.random()*6)}px;background:linear-gradient(to top,${colors[Math.floor(Math.random()*colors.length)]},transparent);animation-duration:${1.5+Math.random()*2.5}s;animation-delay:${Math.random()*3}s;`;
-    c.appendChild(f);
+    const dur=1.5+Math.random()*3;
+    f.style.cssText=`left:${Math.random()*100}%;width:${s}px;height:${s*(4+Math.random()*6)}px;background:linear-gradient(to top,${colors[Math.floor(Math.random()*colors.length)]},transparent);animation-duration:${dur}s;animation-delay:${Math.random()*4}s;`;
+    // Override flicker keyframe height for roles flames
+    if(maxHeight){
+      f.style.setProperty('--max-h', maxHeight+'px');
+    }
+    container.appendChild(f);
   }
+}
+
+// Override flicker animation for tall flames
+const styleEl=document.createElement('style');
+styleEl.textContent=`
+  .roles-flames .flame{
+    animation-name:flickerTall;
+  }
+  @keyframes flickerTall{
+    0%{opacity:0;transform:translateY(0) scaleX(1)}
+    8%{opacity:0.8}
+    50%{transform:translateY(-50vh) scaleX(0.5) rotate(2deg);opacity:0.5}
+    100%{transform:translateY(-105vh) scaleX(0.15) rotate(-4deg);opacity:0}
+  }
+`;
+document.head.appendChild(styleEl);
+
+(function spawnFlames(){
+  spawnFlameParticles(document.getElementById('flames'), 40, null);
+  spawnFlameParticles(document.getElementById('rolesFlames'), 55, null);
 })();
 
 function renderPyramid(){
