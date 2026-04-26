@@ -99,6 +99,7 @@ body{background:var(--dark);color:var(--parchment);font-family:'Cinzel',serif;ov
 .role-btn:hover{border-color:var(--gold);color:var(--gold-bright);background:rgba(201,151,43,.1);box-shadow:0 0 20px rgba(201,151,43,.2);transform:translateY(-2px)}
 .role-btn .role-icon{display:block;font-size:1.3rem;margin-bottom:.4rem}
 .role-btn .cross-wrap{display:block;margin:0 auto .45rem;width:22px;height:22px}
+.role-btn .role-th{display:block;font-family:'Sarabun',sans-serif;font-size:.68rem;font-weight:300;letter-spacing:.04em;color:var(--gold-dim);margin-top:.18rem;opacity:.8}
 .role-btn .role-count{display:inline-block;margin-top:.35rem;background:rgba(201,151,43,.18);border:1px solid rgba(201,151,43,.35);color:var(--gold);font-size:.6rem;letter-spacing:.1em;padding:.1rem .5rem;border-radius:20px}
 .pyramid-tier[data-tier="0"] .role-btn{min-width:160px;border-color:rgba(201,151,43,.55)}
 .pyramid-tier[data-tier="1"] .role-btn{min-width:145px;border-color:rgba(201,151,43,.4)}
@@ -384,6 +385,38 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 
       <div class="chronicle-entry">
         <div class="th-content">
+          <div class="chronicle-section-title">คำประกาศที่ไม่เคยถูกเผยแพร่</div>
+          <p class="chronicle-text">ในปลายปี 1766<br>มีคำสั่งลับจากสภาสูงสุดของศาสนจักร:</p>
+          <div class="chronicle-quote">"ต่อให้โลกเลือกเดินไปสู่แสง<br>เราจะเป็นผู้แบกความมืดไว้เอง"</div>
+          <div class="chronicle-quote">"ต่อให้ความจริงถูกค้นพบ<br>มันจะไม่ถูกเข้าใจ"</div>
+          <div class="chronicle-quote">"และหากวันใดที่มนุษย์เห็นสิ่งเดียวกับเรา—<br>วันนั้น…จะไม่มีคำว่าโลกอีกต่อไป"</div>
+        </div>
+        <div class="en-content">
+          <div class="chronicle-section-title">The Declaration Never Revealed</div>
+          <p class="chronicle-text">In late 1766,<br>a secret decree was issued from the Supreme Council of the Order:</p>
+          <div class="chronicle-quote">"Though the world chooses to walk toward the light,<br>we shall bear the darkness ourselves."</div>
+          <div class="chronicle-quote">"Though the truth is discovered,<br>it shall not be understood."</div>
+          <div class="chronicle-quote">"And if the day comes when mankind sees what we have seen—<br>that day… there will be no more world."</div>
+        </div>
+      </div>
+
+      <div class="chronicle-entry">
+        <div class="th-content">
+          <p class="chronicle-text">โลกปี 1766 ไม่ได้เปลี่ยนเพราะวิทยาศาสตร์</p>
+          <p class="chronicle-text">แต่มันเปลี่ยน<br>เพราะ <em>"บางสิ่ง"</em> เริ่มขยับ</p>
+          <p class="chronicle-text">และในขณะที่ผู้คนกำลังค้นหาความจริง</p>
+          <p class="chronicle-text">ศาสนจักรกำลัง<br><strong style="color:var(--gold-bright)">"ฝังมันลงไปให้ลึกกว่าเดิม"</strong></p>
+        </div>
+        <div class="en-content">
+          <p class="chronicle-text">The world of 1766 did not change because of science.</p>
+          <p class="chronicle-text">But it changed<br>because <em>"something"</em> began to stir.</p>
+          <p class="chronicle-text">And while people were searching for the truth,</p>
+          <p class="chronicle-text">the Order was<br><strong style="color:var(--gold-bright)">"burying it deeper than before."</strong></p>
+        </div>
+      </div>
+
+      <div class="chronicle-entry">
+        <div class="th-content">
           <div class="chronicle-section-title">บันทึกสุดท้าย — ปี 1766</div>
           <div class="chronicle-quote">"เราไม่ได้ต่อสู้กับความมืด<br>เราเป็นผู้ที่ยืนอยู่ระหว่างความมืดกับแสงสว่าง<br>และตัดสินใจว่า…แสงสว่างดวงใดที่โลกควรเห็น"</div>
           <p class="chronicle-text" style="margin-top:1.5rem;opacity:.5;font-size:.82rem;letter-spacing:.05em">— บันทึกของ Cardinal แห่งศาสนจักร, ปี 1766</p>
@@ -391,7 +424,7 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
         <div class="en-content">
           <div class="chronicle-section-title">Final Record — Year 1766</div>
           <div class="chronicle-quote">"We do not fight the darkness.<br>We are those who stand between darkness and light,<br>and decide… which light the world should see."</div>
-          <p class="chronicle-text" style="margin-top:1.5rem;opacity:.5;font-size:.82rem;letter-spacing:.05em">— Record of the Cardinal of the Order, 1766</p>
+          <p class="chronicle-text" style="margin-top:1.5rem;opacity:.5;font-size:.82rem;letter-spacing:.05em">— Record of the Cardinal of the Order, Year 1766</p>
         </div>
       </div>
 
@@ -448,22 +481,22 @@ const db = getFirestore(app);
 function crossSVG(){return '<svg class="cross-wrap" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="10" y="2" width="4" height="20" rx="1.2" fill="#c9972b"/><rect x="3" y="8" width="18" height="4" rx="1.2" fill="#c9972b"/></svg>';}
 
 const PYRAMID=[
-  [{name:"Probe",            ih:()=>crossSVG(),                                    lbl:"✝"}],
-  [{name:"Cardinal",         ih:()=>'<span class="role-icon">🎖️</span>',           lbl:"🎖️"}],
-  [{name:"Council Cardinal", ih:()=>'<span class="role-icon">🕊️</span>',           lbl:"🕊️"}],
-  [{name:"Bishop",           ih:()=>'<span class="role-icon">📿</span>',           lbl:"📿"}],
+  [{name:"Probe",            th:"ผู้ถูกทดสอบ",     ih:()=>crossSVG(),                                    lbl:"✝"}],
+  [{name:"Cardinal",         th:"พระคาร์ดินัล",    ih:()=>'<span class="role-icon">🎖️</span>',           lbl:"🎖️"}],
+  [{name:"Council Cardinal", th:"คณะพระคาร์ดินัล", ih:()=>'<span class="role-icon">🕊️</span>',           lbl:"🕊️"}],
+  [{name:"Bishop",           th:"พระสังฆราช",      ih:()=>'<span class="role-icon">📿</span>',           lbl:"📿"}],
   [
-    {name:"Priest",          ih:()=>'<span class="role-icon">✝️</span>',           lbl:"✝️"},
-    {name:"Sister",          ih:()=>'<span class="role-icon">🙏</span>',           lbl:"🙏"},
-    {name:"Medic",           ih:()=>'<span class="role-icon">🏥</span>',           lbl:"🏥"},
+    {name:"Priest",          th:"บาทหลวง",         ih:()=>'<span class="role-icon">✝️</span>',           lbl:"✝️"},
+    {name:"Sister",          th:"ซิสเตอร์",        ih:()=>'<span class="role-icon">🙏</span>',           lbl:"🙏"},
+    {name:"Medic",           th:"แพทย์",           ih:()=>'<span class="role-icon">🏥</span>',           lbl:"🏥"},
   ],
-  [{name:"Head of Knight",   ih:()=>'<span class="role-icon">⚜️</span>',           lbl:"⚜️"}],
-  [{name:"Deputy Knight",    ih:()=>'<span class="role-icon">🛡️</span>',           lbl:"🛡️"}],
+  [{name:"Head of Knight",   th:"หัวหน้าอัศวิน",   ih:()=>'<span class="role-icon">⚜️</span>',           lbl:"⚜️"}],
+  [{name:"Deputy Knight",    th:"รองอัศวิน",       ih:()=>'<span class="role-icon">🛡️</span>',           lbl:"🛡️"}],
   [
-    {name:"Knight",          ih:()=>'<span class="role-icon">⚔️</span>',           lbl:"⚔️"},
-    {name:"Knight Trainer",  ih:()=>'<span class="role-icon">📖</span>',           lbl:"📖"},
+    {name:"Knight",          th:"อัศวิน",          ih:()=>'<span class="role-icon">⚔️</span>',           lbl:"⚔️"},
+    {name:"Knight Trainer",  th:"ครูฝึกอัศวิน",    ih:()=>'<span class="role-icon">📖</span>',           lbl:"📖"},
   ],
-  [{name:"Most Handsome Man",ih:()=>'<span class="role-icon">👑</span>',           lbl:"👑"}],
+  [{name:"Most Handsome Man",th:"ชายหล่อที่สุด",   ih:()=>'<span class="role-icon">👑</span>',           lbl:"👑"}],
 ];
 
 const PASSWORD="Qzk51jbc";
@@ -526,7 +559,8 @@ function renderPyramid(){
     tier.forEach(role=>{
       const count=(members[role.name]||[]).length;
       const btn=document.createElement('button');btn.className='role-btn';
-      btn.innerHTML=`${role.ih()}${role.name}<br><span class="role-count">${count} member${count!==1?'s':''}</span>`;
+      btn.innerHTML=`${role.ih()}${role.name}${role.th?`<br><span class="role-th">${role.th}</span>`:''}
+<span class="role-count">${count} member${count!==1?'s':''}</span>`;
       btn.onclick=()=>goToMembers(role.name);
       row.appendChild(btn);
     });
