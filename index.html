@@ -559,7 +559,7 @@ function loadPyramidStructure(){
       if(snap.exists()&&snap.data().tiers&&snap.data().tiers.length){
         PYRAMID.length=0;
         snap.data().tiers.forEach(tier=>{
-          PYRAMID.push(tier.map(r=>({
+          PYRAMID.push((tier.roles||[]).map(r=>({
             name:r.name,th:r.th||'',_icon:r.icon,
             ih:makeIh(r.icon),lbl:r.lbl||r.icon
           })));
@@ -577,7 +577,7 @@ function loadPyramidStructure(){
 async function savePyramid(){
   try{
     const ref=doc(db,'church','pyramid');
-    const tiers=PYRAMID.map(tier=>tier.map(r=>({name:r.name,th:r.th||'',icon:r._icon||'✦',lbl:r.lbl||r._icon||'✦'})));
+    const tiers=PYRAMID.map(tier=>({roles:tier.map(r=>({name:r.name,th:r.th||'',icon:r._icon||'✦',lbl:r.lbl||r._icon||'✦'}))}));
     await setDoc(ref,{tiers});
   }catch(e){console.error('Pyramid save error:',e);}
 }
