@@ -558,19 +558,28 @@ async function loadMembers(){
     onSnapshot(docRef,(snap)=>{
       if(snap.exists()){
         const data=snap.data();
-        PYRAMID.flat().forEach(r=>{members[r.name]=data[r.name]||[];});
-        if(currentRole&&document.getElementById('members-view').style.display!=='none'){
-          renderMembers(currentRole);
+        // Load pyramid structure if saved
+        if(data._pyramid&&data._pyramid.length){
+          PYRAMID.length=0;
+          data._pyramid.forEach(tier=>{
+            PYRAMID.push(tier.map(r=>({
+              name:r.name,th:r.th||'',_icon:r.icon,
+              ih:makeIh(r.icon),lbl:r.lbl||r.icon
+            })));
+          });
         }
+        PYRAMID.flat().forEach(r=>{members[r.name]=data[r.name]||[];});
+        if(currentRole&&document.getElementById('members-view').style.display!=='none')renderMembers(currentRole);
         renderPyramid();
       }
-    });
+    },(err)=>{console.warn('Firestore error:',err);});
   }catch(e){console.error('Firebase load error:',e);}
 }
 async function saveMembers(){
   try{
     const docRef=doc(db,'church','members');
-    await setDoc(docRef,members);
+    const pyramidTiers=PYRAMID.map(tier=>tier.map(r=>({name:r.name,th:r.th||'',icon:r._icon||'✦',lbl:r.lbl||r._icon||'✦'})));
+    await setDoc(docRef,{...members,_pyramid:pyramidTiers});
   }catch(e){console.error('Firebase save error:',e);}
 }
 function showToast(msg,isError){
@@ -958,81 +967,48 @@ function rmSaveRole(){
     showToast(`"${name}" updated ✦`);
   }
   document.getElementById('roleEditModal').classList.remove('visible');
-  savePyramidStructure();renderPyramid();renderRoleManager();
+  saveMembers();renderPyramid();renderRoleManager();
 }
 
 function rmMoveRole(tierIdx,roleIdx,dir){
   const role=PYRAMID[tierIdx].splice(roleIdx,1)[0];
   const target=dir==='up'?tierIdx-1:tierIdx+1;
   PYRAMID[target].push(role);
-  savePyramidStructure();renderPyramid();renderRoleManager();
+  saveMembers();renderPyramid();renderRoleManager();
 }
 
 function rmSplitRole(tierIdx,roleIdx){
   const role=PYRAMID[tierIdx].splice(roleIdx,1)[0];
   PYRAMID.splice(tierIdx+1,0,[role]);
-  savePyramidStructure();renderPyramid();renderRoleManager();
+  saveMembers();renderPyramid();renderRoleManager();
 }
 
 function rmDeleteRole(tierIdx,roleIdx){
   const role=PYRAMID[tierIdx][roleIdx];
   const mc=(members[role.name]||[]).length;
   if(mc>0&&!confirm(`"${role.name}" has ${mc} member${mc!==1?'s':''}.\nDelete role and all its members?`))return;
-  if(mc>0){delete members[role.name];saveMembers();}
+  if(mc>0)delete members[role.name];
   PYRAMID[tierIdx].splice(roleIdx,1);
   if(PYRAMID[tierIdx].length===0)PYRAMID.splice(tierIdx,1);
-  savePyramidStructure();renderPyramid();renderRoleManager();
+  saveMembers();renderPyramid();renderRoleManager();
 }
 
 function rmMoveTier(tierIdx,dir){
   const swap=dir==='up'?tierIdx-1:tierIdx+1;
   [PYRAMID[tierIdx],PYRAMID[swap]]=[PYRAMID[swap],PYRAMID[tierIdx]];
-  savePyramidStructure();renderPyramid();renderRoleManager();
+  saveMembers();renderPyramid();renderRoleManager();
 }
 
 function rmAddTier(){PYRAMID.push([]);renderRoleManager();}
 
 function rmDeleteTier(tierIdx){
   PYRAMID.splice(tierIdx,1);
-  savePyramidStructure();renderPyramid();renderRoleManager();
+  saveMembers();renderPyramid();renderRoleManager();
 }
 
-async function savePyramidStructure(){
-  try{
-    const ref=doc(db,'church','pyramid');
-    const tiers=PYRAMID.map(tier=>tier.map(r=>({name:r.name,th:r.th||'',icon:r._icon||'✦',lbl:r.lbl||r._icon||'✦'})));
-    await setDoc(ref,{tiers});
-  }catch(e){console.error('Pyramid save error:',e);}
-}
-
-function loadPyramidStructure(){
-  try{
-    const ref=doc(db,'church','pyramid');
-    onSnapshot(ref,(snap)=>{
-      if(snap.exists()&&snap.data().tiers&&snap.data().tiers.length){
-        const tiers=snap.data().tiers;
-        PYRAMID.length=0;
-        tiers.forEach(tier=>{
-          PYRAMID.push(tier.map(r=>({
-            name:r.name,th:r.th||'',_icon:r.icon,
-            ih:makeIh(r.icon),lbl:r.lbl||r.icon
-          })));
-        });
-        PYRAMID.flat().forEach(r=>{if(!members[r.name])members[r.name]=[];});
-        renderPyramid();
-        if(currentRole&&document.getElementById('members-view').style.display!=='none')renderMembers(currentRole);
-      }else{
-        // First time — push hardcoded pyramid to Firebase
-        savePyramidStructure();
-      }
-    },(e)=>{console.warn('Pyramid snapshot error:',e);});
-  }catch(e){console.error('Pyramid load error:',e);}
-}
-
-// Init — pyramid listener starts first, members listener fills in counts
+// Init
 PYRAMID.flat().forEach(r=>{if(!members[r.name])members[r.name]=[];});
 renderPyramid();
-loadPyramidStructure();
 loadMembers();
 
 // Expose all functions to window so onclick handlers work with type="module"
