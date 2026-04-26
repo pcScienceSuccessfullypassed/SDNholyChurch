@@ -1005,33 +1005,35 @@ async function savePyramidStructure(){
   }catch(e){console.error('Pyramid save error:',e);}
 }
 
-async function loadPyramidStructure(){
+function loadPyramidStructure(){
   try{
     const ref=doc(db,'church','pyramid');
-    const snap=await getDoc(ref);
-    if(snap.exists()&&snap.data().tiers&&snap.data().tiers.length){
-      const tiers=snap.data().tiers;
-      PYRAMID.length=0;
-      tiers.forEach(tier=>{
-        PYRAMID.push(tier.map(r=>({
-          name:r.name,th:r.th||'',_icon:r.icon,
-          ih:makeIh(r.icon),lbl:r.lbl||r.icon
-        })));
-      });
-    }else{
-      await savePyramidStructure();
-    }
+    onSnapshot(ref,(snap)=>{
+      if(snap.exists()&&snap.data().tiers&&snap.data().tiers.length){
+        const tiers=snap.data().tiers;
+        PYRAMID.length=0;
+        tiers.forEach(tier=>{
+          PYRAMID.push(tier.map(r=>({
+            name:r.name,th:r.th||'',_icon:r.icon,
+            ih:makeIh(r.icon),lbl:r.lbl||r.icon
+          })));
+        });
+        PYRAMID.flat().forEach(r=>{if(!members[r.name])members[r.name]=[];});
+        renderPyramid();
+        if(currentRole&&document.getElementById('members-view').style.display!=='none')renderMembers(currentRole);
+      }else{
+        // First time — push hardcoded pyramid to Firebase
+        savePyramidStructure();
+      }
+    },(e)=>{console.warn('Pyramid snapshot error:',e);});
   }catch(e){console.error('Pyramid load error:',e);}
 }
 
-// Render pyramid immediately with empty counts, then Firebase fills in data
-async function init(){
-  await loadPyramidStructure();
-  PYRAMID.flat().forEach(r=>{if(!members[r.name])members[r.name]=[];});
-  renderPyramid();
-  loadMembers();
-}
-init();
+// Init — pyramid listener starts first, members listener fills in counts
+PYRAMID.flat().forEach(r=>{if(!members[r.name])members[r.name]=[];});
+renderPyramid();
+loadPyramidStructure();
+loadMembers();
 
 // Expose all functions to window so onclick handlers work with type="module"
 window.exploreClick=exploreClick;
